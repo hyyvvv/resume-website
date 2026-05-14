@@ -213,10 +213,11 @@
       overflow-x: auto;
       scroll-snap-type: x mandatory;
       scroll-behavior: smooth;
-      padding: 12px max(10px, calc((100% - min(72vw, 300px)) / 2));
+      padding: 12px max(10px, calc((100% - min(64vw, 240px)) / 2));
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
       touch-action: pan-x;
+      min-height: 72px;
     }
 
     .comment-carouselScroll::-webkit-scrollbar {
@@ -224,7 +225,7 @@
     }
 
     .comment-carouselSlide {
-      flex: 0 0 min(72vw, 300px);
+      flex: 0 0 min(64vw, 240px);
       scroll-snap-align: center;
       display: flex;
       align-items: center;
@@ -236,26 +237,36 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: transparent;
-      border-radius: 0;
+      background: rgba(208, 143, 160, 0.1);
+      border-radius: 12px;
       overflow: visible;
       box-shadow: none;
       transform-origin: center center;
       will-change: transform, opacity;
+      min-height: 100px;
     }
 
-    /* 轮播内为缩略图：保持原图比例，不裁成方块 */
+    /* 轮播内为缩略图：保持原图比例，整体更小 */
     .comment-carouselCard img {
       display: block;
       width: auto;
       max-width: 100%;
       height: auto;
-      max-height: min(56vh, 420px);
+      max-height: min(40vh, 260px);
       object-fit: contain;
       object-position: center;
       cursor: pointer;
-      border-radius: 12px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      border-radius: 10px;
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.07);
+    }
+
+    .carousel-loading-msg {
+      margin: 0;
+      padding: 28px 16px;
+      text-align: center;
+      color: #9a8490;
+      font-size: 14px;
+      width: 100%;
     }
 
     .comment-carousel-hint,
@@ -336,7 +347,7 @@
       }
 
       .comment-carouselCard img {
-        max-height: min(50vh, 360px);
+        max-height: min(34vh, 220px);
       }
 
     }
@@ -496,7 +507,7 @@
         </div>
       </div>
 
-      <button class="back-btn" onclick="closePage()">返回首页</button>
+      <button class="back-btn" onclick="closePage()">回到顶部</button>
     </div>
 
   </div>
@@ -523,6 +534,36 @@
       }
 
       panel.classList.add('active');
+
+      if (id === 'comment') {
+        loadPeekCarouselFromManifest(
+          'commentCarouselScroll',
+          'commentCarouselHint',
+          'comments/manifest.json',
+          '宝妈评价',
+          'comment',
+          '未能加载评价图片列表。请将照片放入 comments 后运行 update-comments-manifest.ps1 生成缩略图与 manifest；并用网页地址打开本页。'
+        );
+      }
+
+      if (id === 'work') {
+        loadPeekCarouselFromManifest(
+          'foodShowCarouselScroll',
+          'foodShowGalleryHint',
+          'show/manifest.json',
+          '美食展示',
+          'work',
+          ''
+        );
+        loadPeekCarouselFromManifest(
+          'workPhotoCarouselScroll',
+          'workPhotoGalleryHint',
+          'work-photo/manifest.json',
+          '工作照片',
+          'work',
+          ''
+        );
+      }
 
       requestAnimationFrame(function () {
         requestAnimationFrame(function () {
@@ -658,11 +699,26 @@
         return;
       }
 
+      if (sc.dataset.manifestDone === '1') {
+        if (sc._commentCarouselUpdate) {
+          sc._commentCarouselUpdate();
+        }
+        return;
+      }
+
+      if (sc.dataset.manifestLoading === '1') {
+        return;
+      }
+
+      sc.dataset.manifestLoading = '1';
+
       if (hintId === 'commentCarouselHint') {
         setCommentCarouselHint('', false);
       } else if (hintId) {
         setGalleryHint(hintId, '', false);
       }
+
+      sc.innerHTML = '<p class="carousel-loading-msg" role="status">加载中…</p>';
 
       fetch(manifestUrl)
         .then(function (res) {
@@ -703,13 +759,21 @@
             const img = document.createElement('img');
             img.alt = altPrefix + ' ' + (i + 1);
             img.decoding = 'async';
-            img.sizes = '(max-width: 768px) 72vw, 300px';
+            img.sizes = '(max-width: 768px) 64vw, 240px';
 
             const thumbSrc = thumbs[i] || fullSrc;
             img.src = thumbSrc;
             img.setAttribute('data-full-src', fullSrc);
 
-            if (i === 0) {
+            img.onerror = function () {
+              const full = this.getAttribute('data-full-src');
+              if (full && this.src !== full) {
+                this.onerror = null;
+                this.src = full;
+              }
+            };
+
+            if (i < 2) {
               img.loading = 'eager';
               img.fetchPriority = 'high';
             } else {
@@ -732,6 +796,8 @@
           if (sc._commentCarouselUpdate) {
             sc._commentCarouselUpdate();
           }
+
+          sc.dataset.manifestDone = '1';
         })
         .catch(function () {
 
@@ -745,6 +811,9 @@
           } else if (hintId) {
             setGalleryHint(hintId, msg, true);
           }
+        })
+        .finally(function () {
+          sc.dataset.manifestLoading = '';
         });
     }
 
@@ -753,33 +822,6 @@
       initPeekCarousel(document.getElementById('commentCarouselScroll'), 'comment');
       initPeekCarousel(document.getElementById('foodShowCarouselScroll'), 'work');
       initPeekCarousel(document.getElementById('workPhotoCarouselScroll'), 'work');
-
-      loadPeekCarouselFromManifest(
-        'commentCarouselScroll',
-        'commentCarouselHint',
-        'comments/manifest.json',
-        '宝妈评价',
-        'comment',
-        '未能加载评价图片列表。请将照片放入 comments 后运行 update-comments-manifest.ps1 生成缩略图与 manifest；并用网页地址打开本页。'
-      );
-
-      loadPeekCarouselFromManifest(
-        'foodShowCarouselScroll',
-        'foodShowGalleryHint',
-        'show/manifest.json',
-        '美食展示',
-        'work',
-        ''
-      );
-
-      loadPeekCarouselFromManifest(
-        'workPhotoCarouselScroll',
-        'workPhotoGalleryHint',
-        'work-photo/manifest.json',
-        '工作照片',
-        'work',
-        ''
-      );
     }
 
     if (document.readyState === 'loading') {
