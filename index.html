@@ -233,20 +233,29 @@
 
     .comment-carouselCard {
       width: 100%;
-      border-radius: 18px;
-      overflow: hidden;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border-radius: 0;
+      overflow: visible;
+      box-shadow: none;
       transform-origin: center center;
       will-change: transform, opacity;
     }
 
+    /* 轮播内为缩略图：保持原图比例，不裁成方块 */
     .comment-carouselCard img {
       display: block;
-      width: 100%;
+      width: auto;
+      max-width: 100%;
       height: auto;
-      max-height: min(52vh, 360px);
-      object-fit: cover;
+      max-height: min(56vh, 420px);
+      object-fit: contain;
+      object-position: center;
       cursor: pointer;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
     }
 
     .comment-carousel-hint,
@@ -300,6 +309,7 @@
       max-width: 90%;
       max-height: 85%;
       border-radius: 20px;
+      object-fit: contain;
     }
 
     /* 手机适配 */
@@ -326,7 +336,7 @@
       }
 
       .comment-carouselCard img {
-        max-height: min(48vh, 320px);
+        max-height: min(50vh, 360px);
       }
 
     }
@@ -464,6 +474,8 @@
     <!-- 上户展示 -->
     <div id="work" class="detail-page">
 
+      <h2>上户展示</h2>
+
       <!-- 美食展示（图片来自 show 目录） -->
       <div class="sub-section">
         <h3>美食展示</h3>
@@ -541,12 +553,15 @@
       });
     }
 
-    // 打开放大图片
+    // 打开放大图片（传入原图地址；灯箱内完整比例展示）
     function openLightbox(src) {
 
-      document.getElementById('lightbox').style.display = 'flex';
-
-      document.getElementById('lightbox-img').src = src;
+      const box = document.getElementById('lightbox');
+      const img = document.getElementById('lightbox-img');
+      box.style.display = 'flex';
+      img.fetchPriority = 'high';
+      img.decoding = 'async';
+      img.src = src;
     }
 
     // 关闭放大图片
@@ -649,7 +664,7 @@
         setGalleryHint(hintId, '', false);
       }
 
-      fetch(manifestUrl, { cache: 'no-store' })
+      fetch(manifestUrl)
         .then(function (res) {
 
           if (!res.ok) {
@@ -669,9 +684,17 @@
             throw new Error('empty');
           }
 
+          let thumbs = data.thumbnails;
+          if (typeof thumbs === 'string') {
+            thumbs = [thumbs];
+          }
+          if (!Array.isArray(thumbs) || thumbs.length !== list.length) {
+            thumbs = list.slice();
+          }
+
           sc.innerHTML = '';
 
-          list.forEach(function (src, i) {
+          list.forEach(function (fullSrc, i) {
 
             const slide = document.createElement('div');
             slide.className = 'comment-carouselSlide';
@@ -679,10 +702,22 @@
             card.className = 'comment-carouselCard';
             const img = document.createElement('img');
             img.alt = altPrefix + ' ' + (i + 1);
-            img.loading = 'lazy';
-            img.src = src;
+            img.decoding = 'async';
+            img.sizes = '(max-width: 768px) 72vw, 300px';
+
+            const thumbSrc = thumbs[i] || fullSrc;
+            img.src = thumbSrc;
+            img.setAttribute('data-full-src', fullSrc);
+
+            if (i === 0) {
+              img.loading = 'eager';
+              img.fetchPriority = 'high';
+            } else {
+              img.loading = 'lazy';
+            }
+
             img.onclick = function () {
-              openLightbox(this.src);
+              openLightbox(this.getAttribute('data-full-src') || this.src);
             };
             img.addEventListener('load', function () {
               if (sc._commentCarouselUpdate) {
@@ -703,7 +738,7 @@
           sc.innerHTML = '';
 
           const msg = hintOnError ||
-            '未能加载图片列表。请将照片放入对应文件夹后运行 update-comments-manifest.ps1，并用本地网页服务打开本页（勿用 file://）。';
+            '未能加载图片列表。请将照片放入对应文件夹后运行 update-comments-manifest.ps1（会生成缩略图 thumbs 与 manifest），并用网页地址打开本页（勿用 file://）。';
 
           if (hintId === 'commentCarouselHint') {
             setCommentCarouselHint(msg, true);
@@ -725,7 +760,7 @@
         'comments/manifest.json',
         '宝妈评价',
         'comment',
-        '未能加载评价图片列表。请将照片放入 comments 文件夹后运行 update-comments-manifest.ps1；并用本地网页服务打开本页，勿用 file://。'
+        '未能加载评价图片列表。请将照片放入 comments 后运行 update-comments-manifest.ps1 生成缩略图与 manifest；并用网页地址打开本页。'
       );
 
       loadPeekCarouselFromManifest(
