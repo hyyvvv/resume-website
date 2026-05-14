@@ -213,7 +213,7 @@
       overflow-x: auto;
       scroll-snap-type: x mandatory;
       scroll-behavior: smooth;
-      padding: 10px max(8px, calc((100% - min(38vw, 132px)) / 2));
+      padding: 10px max(8px, calc((100% - min(56vw, 200px)) / 2));
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
       touch-action: pan-x;
@@ -225,7 +225,7 @@
     }
 
     .comment-carouselSlide {
-      flex: 0 0 min(38vw, 132px);
+      flex: 0 0 min(56vw, 200px);
       scroll-snap-align: center;
       display: flex;
       align-items: center;
@@ -243,16 +243,16 @@
       box-shadow: none;
       transform-origin: center center;
       will-change: transform, opacity;
-      min-height: 80px;
+      min-height: 96px;
     }
 
-    /* 约手机红线框比例：竖向略长、整体明显缩小，仍保持原图比例 */
+    /* 约为上一版小图的 1.5 倍；仍保持原图比例（contain） */
     .comment-carouselCard img {
       display: block;
       width: auto;
-      max-width: min(38vw, 132px);
+      max-width: min(56vw, 200px);
       height: auto;
-      max-height: min(26vh, 170px);
+      max-height: min(39vh, 255px);
       object-fit: contain;
       object-position: center;
       cursor: pointer;
@@ -347,8 +347,8 @@
       }
 
       .comment-carouselCard img {
-        max-width: min(36vw, 124px);
-        max-height: min(24vh, 158px);
+        max-width: min(54vw, 188px);
+        max-height: min(36vh, 238px);
       }
 
     }
@@ -760,7 +760,7 @@
             const img = document.createElement('img');
             img.alt = altPrefix + ' ' + (i + 1);
             img.decoding = 'async';
-            img.sizes = '(max-width: 768px) 38vw, 132px';
+            img.sizes = '(max-width: 768px) 56vw, 200px';
 
             const thumbSrc = thumbs[i] || fullSrc;
             img.src = thumbSrc;
