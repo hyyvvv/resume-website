@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>王宝坤-个人简历</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "PingFang SC", sans-serif;
+    }
+
+    body {
+      background: #f8e8ee;
+      color: #5e4b56;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+    }
+
+    /* 顶部个人信息 */
+    .hero {
+      text-align: center;
+      padding: 30px 20px;
+      background: #fff7f9;
+      border-radius: 30px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+      margin-bottom: 25px;
+    }
+
+    .hero img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 5px solid #f3d7df;
+    }
+
+    .hero h1 {
+      margin-top: 15px;
+      font-size: 30px;
+    }
+
+    .hero p {
+      margin-top: 10px;
+      color: #7a6670;
+      line-height: 1.7;
+    }
+
+    /* 卡片区域 */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+    }
+
+    .card {
+      background: #fff7f9;
+      padding: 30px 20px;
+      border-radius: 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card h2 {
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      font-size: 14px;
+      color: #8b7680;
+    }
+
+    /* 详情区域 */
+    .detail-page {
+      display: none;
+      margin-top: 25px;
+      background: #fff7f9;
+      border-radius: 30px;
+      padding: 25px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    }
+
+    .detail-page.active {
+      display: block;
+    }
+
+    .detail-page h2 {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    /* 个人信息：多行文字 */
+    .info-profile {
+      text-align: left;
+      color: #5e4b56;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .info-profile .info-line {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 8px 14px;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(208, 143, 160, 0.25);
+    }
+
+    .info-profile .info-line:last-of-type {
+      border-bottom: none;
+    }
+
+    .info-profile .info-sep {
+      color: #c4aeb8;
+      font-weight: 300;
+      user-select: none;
+    }
+
+    .info-profile .info-block-para {
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(208, 143, 160, 0.25);
+    }
+
+    .info-profile .info-block-para:last-of-type {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .info-profile .info-label {
+      color: #9a8490;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    /* 证书平铺：上 2 下 3，手机适配 */
+    .cert-strip {
+      margin-top: 14px;
+    }
+
+    .cert-strip .cert-row {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .cert-strip .cert-row--2 {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .cert-strip .cert-row--3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .cert-strip img {
+      width: 100%;
+      height: auto;
+      max-height: 140px;
+      object-fit: contain;
+      object-position: center top;
+      border-radius: 10px;
+      background: #fff;
+      border: 1px solid rgba(208, 143, 160, 0.2);
+      display: block;
+    }
+
+    /* 图片展示 */
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .gallery img {
+      width: 100%;
+      border-radius: 18px;
+      object-fit: cover;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .gallery img:hover {
+      transform: scale(1.03);
+    }
+
+    /* 宝妈评价：横向滑动，中间大、两侧小 */
+    .comment-carousel {
+      margin-top: 12px;
+      margin-left: -8px;
+      margin-right: -8px;
+    }
+
+    .comment-carouselScroll {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      padding: 12px max(10px, calc((100% - min(72vw, 300px)) / 2));
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      touch-action: pan-x;
+    }
+
+    .comment-carouselScroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .comment-carouselSlide {
+      flex: 0 0 min(72vw, 300px);
+      scroll-snap-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .comment-carouselCard {
+      width: 100%;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+      transform-origin: center center;
+      will-change: transform, opacity;
+    }
+
+    .comment-carouselCard img {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: min(52vh, 360px);
+      object-fit: cover;
+      cursor: pointer;
+    }
+
+    .comment-carousel-hint,
+    .gallery-hint {
+      text-align: center;
+      color: #9a8490;
+      font-size: 13px;
+      line-height: 1.6;
+      padding: 16px 8px 0;
+      margin: 0;
+    }
+
+    /* 上户展示二级分类 */
+    .sub-section {
+      margin-top: 30px;
+    }
+
+    .sub-section h3 {
+      margin-bottom: 15px;
+      color: #d08fa0;
+    }
+
+    /* 返回按钮 */
+    .back-btn {
+      margin-top: 25px;
+      background: #d8a7b1;
+      color: white;
+      border: none;
+      padding: 12px 22px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    /* 图片放大 */
+    .lightbox {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .lightbox img {
+      max-width: 90%;
+      max-height: 85%;
+      border-radius: 20px;
+    }
+
+    /* 手机适配 */
+    @media (max-width: 768px) {
+
+      .card-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .gallery {
+        grid-template-columns: 1fr;
+      }
+
+      .hero h1 {
+        font-size: 24px;
+      }
+
+      .info-profile {
+        font-size: 13px;
+      }
+
+      .cert-strip img {
+        max-height: 120px;
+      }
+
+      .comment-carouselCard img {
+        max-height: min(48vh, 320px);
+      }
+
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <!-- 顶部 -->
+    <div class="hero">
+      <img src="basic-phtot.png">
+      <h1>王宝坤</h1>
+      <p>
+        13年母婴护理经验<br>
+        专注新生儿护理与月子餐制作
+      </p>
+    </div>
+
+    <!-- 首页模块 -->
+    <div class="card-grid">
+
+      <div class="card" onclick="showPage('info')">
+        <h2>个人信息</h2>
+        <p>了解我的工作经历与基本信息</p>
+      </div>
+
+      <div class="card" onclick="showPage('skill')">
+        <h2>专业技能</h2>
+        <p>护理、月子餐、早教等专业能力</p>
+      </div>
+
+      <div class="card" onclick="showPage('comment')">
+        <h2>宝妈评价</h2>
+        <p>真实客户反馈与服务评价</p>
+      </div>
+
+      <div class="card" onclick="showPage('work')">
+        <h2>上户展示</h2>
+        <p>工作照片与美食展示</p>
+      </div>
+
+    </div>
+
+    <!-- 个人信息 -->
+    <div id="info" class="detail-page">
+      <h2>个人信息</h2>
+
+      <div class="info-profile">
+        <div class="info-line">
+          <span>姓名：王宝坤</span><span class="info-sep">|</span>
+          <span>联系方式：159-6830-4207</span><span class="info-sep">|</span>
+          <span>年龄：46岁</span>
+        </div>
+        <div class="info-line">
+          <span>籍贯：浙江省嘉兴市</span><span class="info-sep">|</span>
+          <span>民族：汉族</span><span class="info-sep">|</span>
+          <span>属相：马</span><span class="info-sep">|</span>
+          <span>学历：中专</span>
+        </div>
+        <div class="info-block-para">
+          <div class="info-label">工作经历：2013 年1月- 至今   月子会所月嫂 & 住家月嫂</div>
+          <p>累计服务超过60个家庭，具备系统化母婴护理实务经验。多次负责早产、低体重、双胞胎、新生儿黄疸偏高等
+            特殊类型宝宝的照护，对新生儿喂养管理、作息建立、情绪安抚及产妇身体恢复全过程均有成熟经验。</p>
+        </div>
+        <div class="info-block-para">
+          <div class="info-label">技能证书</div>
+        </div>
+
+        <div class="cert-strip" aria-label="证书照片">
+          <div class="cert-row cert-row--2">
+            <img src="information/0.jpg" alt="证书 1" loading="lazy">
+            <img src="information/1.jpg" alt="证书 2" loading="lazy">
+          </div>
+          <div class="cert-row cert-row--3">
+            <img src="information/2.jpg" alt="证书 3" loading="lazy">
+            <img src="information/232.jpg" alt="证书 4" loading="lazy">
+            <img src="information/2322.jpg" alt="证书 5" loading="lazy">
+          </div>
+        </div>
+      </div>
+
+      <button class="back-btn" onclick="closePage()">回到顶部</button>
+    </div>
+
+    <!-- 专业技能 -->
+    <div id="skill" class="detail-page">
+      <h2>专业技能</h2>
+      <div class="info-profile">
+        <div class="info-block-para">
+          <div class="info-label">母婴护理类：</div>
+          <p>新生儿日常护理：洗澡、抚触、肚脐护理、黄疸辨别、婴儿游泳、作息规律建立
+            <br>
+            新生儿护理：洗澡、抚触、肚脐护理、黄疸观察、红臀、肠绞痛、吐奶、呛奶急救（含海姆立克）
+            <br>
+            特殊宝宝照护：早产儿、低体重宝宝
+            <br>
+            婴幼儿成长照护：科学抱姿、安抚技巧、睡眠引导、基础早教启蒙、感觉统合初阶训练
+            <br>
+            产妇护理：恶露观察、情绪关怀、喂养姿势矫正
+            <br>
+            喂养相关：母乳喂养指导、奶量管理、断奶过渡</p>
+        </div>
+        <div class="info-block-para">
+          <div class="info-label">营养与饮食类：</div>
+          <p>中式家常菜、面食制作
+            <br>
+            月子餐制定与执行（分阶段营养方案调配）
+            <br>
+            营养餐搭配、产后恢复餐科学设计</p>
+        </div>
+        <div class="info-block-para">
+          <div class="info-label">专业产后调理类：</div>
+          <p>催乳、通乳、涨奶疏导、乳房护理、恶露观察、产褥期保健、产后身体恢复辅助
+            <br>
+            喂养方式评估（母乳/混合/奶粉）与个性化喂养方案指导</p>
+        </div>
+      </div>
+      <button class="back-btn" onclick="closePage()">回到顶部</button>
+    </div>
+
+    <!-- 宝妈评价 -->
+    <div id="comment" class="detail-page">
+      <h2>宝妈评价</h2>
+
+      <div class="comment-carousel" aria-label="宝妈评价截图滑动浏览">
+        <div class="comment-carouselScroll" id="commentCarouselScroll"></div>
+        <p class="comment-carousel-hint" id="commentCarouselHint" hidden></p>
+      </div>
+
+      <button class="back-btn" onclick="closePage()">回到顶部</button>
+    </div>
+
+    <!-- 上户展示 -->
+    <div id="work" class="detail-page">
+
+      <!-- 美食展示（图片来自 show 目录） -->
+      <div class="sub-section">
+        <h3>美食展示</h3>
+
+        <div class="comment-carousel" aria-label="美食展示滑动浏览">
+          <div class="comment-carouselScroll" id="foodShowCarouselScroll"></div>
+          <p class="gallery-hint" id="foodShowGalleryHint" hidden></p>
+        </div>
+      </div>
+
+      <!-- 工作照片（图片来自 work-photo 目录） -->
+      <div class="sub-section">
+        <h3>工作照片</h3>
+
+        <div class="comment-carousel" aria-label="工作照片滑动浏览">
+          <div class="comment-carouselScroll" id="workPhotoCarouselScroll"></div>
+          <p class="gallery-hint" id="workPhotoGalleryHint" hidden></p>
+        </div>
+      </div>
+
+      <button class="back-btn" onclick="closePage()">返回首页</button>
+    </div>
+
+  </div>
+
+  <!-- 图片放大 -->
+  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <img id="lightbox-img">
+  </div>
+
+  <script>
+
+    // 打开详情页：对齐到该模块顶部，避免整页滚到最底部
+    function showPage(id) {
+
+      const pages = document.querySelectorAll('.detail-page');
+
+      pages.forEach(function (page) {
+        page.classList.remove('active');
+      });
+
+      const panel = document.getElementById(id);
+      if (!panel) {
+        return;
+      }
+
+      panel.classList.add('active');
+
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          if (id === 'comment') {
+            refreshPeekCarousel('commentCarouselScroll');
+          }
+          if (id === 'work') {
+            refreshPeekCarousel('foodShowCarouselScroll');
+            refreshPeekCarousel('workPhotoCarouselScroll');
+          }
+          panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      });
+    }
+
+    // 返回首页
+    function closePage() {
+
+      const pages = document.querySelectorAll('.detail-page');
+
+      pages.forEach(page => {
+        page.classList.remove('active');
+      });
+
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+
+    // 打开放大图片
+    function openLightbox(src) {
+
+      document.getElementById('lightbox').style.display = 'flex';
+
+      document.getElementById('lightbox-img').src = src;
+    }
+
+    // 关闭放大图片
+    function closeLightbox() {
+
+      document.getElementById('lightbox').style.display = 'none';
+    }
+
+    // 横向轮播：中间大、两侧小（scrollId 对应 .comment-carouselScroll 容器）
+    function initPeekCarousel(scrollEl, detailPageId) {
+
+      if (!scrollEl || scrollEl.dataset.carouselInit === '1') {
+        return;
+      }
+
+      scrollEl.dataset.carouselInit = '1';
+      scrollEl._peekCarouselDetailId = detailPageId;
+
+      const update = function () {
+
+        const page = document.getElementById(detailPageId);
+        if (!page || !page.classList.contains('active') || scrollEl.clientWidth < 8) {
+          return;
+        }
+
+        const mid = scrollEl.getBoundingClientRect().left + scrollEl.clientWidth / 2;
+
+        scrollEl.querySelectorAll('.comment-carouselSlide').forEach(function (slide) {
+
+          const card = slide.querySelector('.comment-carouselCard');
+          if (!card) {
+            return;
+          }
+
+          const r = slide.getBoundingClientRect();
+          const slideMid = r.left + r.width / 2;
+          const dist = Math.abs(slideMid - mid);
+          const span = Math.max(scrollEl.clientWidth * 0.42, 1);
+          const t = Math.min(1, dist / span);
+          const scale = 1 - 0.2 * t;
+          const opacity = 1 - 0.38 * t;
+
+          card.style.transform = 'scale(' + scale + ')';
+          card.style.opacity = String(opacity);
+        });
+      };
+
+      scrollEl._commentCarouselUpdate = update;
+
+      scrollEl.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', update);
+
+      scrollEl.querySelectorAll('img').forEach(function (img) {
+        img.addEventListener('load', update);
+      });
+
+      update();
+    }
+
+    function refreshPeekCarousel(scrollId) {
+
+      const sc = document.getElementById(scrollId);
+      if (sc && sc._commentCarouselUpdate) {
+        sc._commentCarouselUpdate();
+      }
+    }
+
+    function setCommentCarouselHint(text, show) {
+
+      const hint = document.getElementById('commentCarouselHint');
+      if (!hint) {
+        return;
+      }
+
+      hint.textContent = text || '';
+      hint.hidden = !show;
+    }
+
+    function setGalleryHint(hintId, text, show) {
+
+      const hint = document.getElementById(hintId);
+      if (!hint) {
+        return;
+      }
+
+      hint.textContent = text || '';
+      hint.hidden = !show;
+    }
+
+    function loadPeekCarouselFromManifest(scrollId, hintId, manifestUrl, altPrefix, detailPageId, hintOnError) {
+
+      const sc = document.getElementById(scrollId);
+      if (!sc) {
+        return;
+      }
+
+      if (hintId === 'commentCarouselHint') {
+        setCommentCarouselHint('', false);
+      } else if (hintId) {
+        setGalleryHint(hintId, '', false);
+      }
+
+      fetch(manifestUrl, { cache: 'no-store' })
+        .then(function (res) {
+
+          if (!res.ok) {
+            throw new Error('manifest');
+          }
+
+          return res.json();
+        })
+        .then(function (data) {
+
+          let list = data && data.images;
+          if (typeof list === 'string') {
+            list = [list];
+          }
+
+          if (!Array.isArray(list) || list.length === 0) {
+            throw new Error('empty');
+          }
+
+          sc.innerHTML = '';
+
+          list.forEach(function (src, i) {
+
+            const slide = document.createElement('div');
+            slide.className = 'comment-carouselSlide';
+            const card = document.createElement('div');
+            card.className = 'comment-carouselCard';
+            const img = document.createElement('img');
+            img.alt = altPrefix + ' ' + (i + 1);
+            img.loading = 'lazy';
+            img.src = src;
+            img.onclick = function () {
+              openLightbox(this.src);
+            };
+            img.addEventListener('load', function () {
+              if (sc._commentCarouselUpdate) {
+                sc._commentCarouselUpdate();
+              }
+            });
+            card.appendChild(img);
+            slide.appendChild(card);
+            sc.appendChild(slide);
+          });
+
+          if (sc._commentCarouselUpdate) {
+            sc._commentCarouselUpdate();
+          }
+        })
+        .catch(function () {
+
+          sc.innerHTML = '';
+
+          const msg = hintOnError ||
+            '未能加载图片列表。请将照片放入对应文件夹后运行 update-comments-manifest.ps1，并用本地网页服务打开本页（勿用 file://）。';
+
+          if (hintId === 'commentCarouselHint') {
+            setCommentCarouselHint(msg, true);
+          } else if (hintId) {
+            setGalleryHint(hintId, msg, true);
+          }
+        });
+    }
+
+    function bootPeekCarousels() {
+
+      initPeekCarousel(document.getElementById('commentCarouselScroll'), 'comment');
+      initPeekCarousel(document.getElementById('foodShowCarouselScroll'), 'work');
+      initPeekCarousel(document.getElementById('workPhotoCarouselScroll'), 'work');
+
+      loadPeekCarouselFromManifest(
+        'commentCarouselScroll',
+        'commentCarouselHint',
+        'comments/manifest.json',
+        '宝妈评价',
+        'comment',
+        '未能加载评价图片列表。请将照片放入 comments 文件夹后运行 update-comments-manifest.ps1；并用本地网页服务打开本页，勿用 file://。'
+      );
+
+      loadPeekCarouselFromManifest(
+        'foodShowCarouselScroll',
+        'foodShowGalleryHint',
+        'show/manifest.json',
+        '美食展示',
+        'work',
+        ''
+      );
+
+      loadPeekCarouselFromManifest(
+        'workPhotoCarouselScroll',
+        'workPhotoGalleryHint',
+        'work-photo/manifest.json',
+        '工作照片',
+        'work',
+        ''
+      );
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bootPeekCarousels);
+    } else {
+      bootPeekCarousels();
+    }
+
+  </script>
+
+</body>
+</html>
